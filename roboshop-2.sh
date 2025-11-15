@@ -32,6 +32,8 @@ do
         --query 'Reservations[0].Instances[0].PrivateIpAddress' \
         --output text)
 
+    echo "Instance: ${instance}, Instance ID: ${INSTANCE_ID}, Public IP Address: ${PUBLIC_IP_ADDRESS}, Private IP Address: ${PRIVATE_IP_ADDRESS}"
+
     # Step 3: Determine DNS record and IP based on instance type
 
     if [ "${instance}" != 'frontend' ]
@@ -43,9 +45,7 @@ do
         IP_ADDRESS="${PUBLIC_IP_ADDRESS}"
     fi
 
-    echo "Instance: ${instance}, Instance ID: ${INSTANCE_ID}, IP Address: ${IP_ADDRESS}"
-
-    # Step 4: Update Route53 Records (note: no $() around the command)
+    # Step 4: Update Route53 Records
     aws route53 change-resource-record-sets \
         --hosted-zone-id "${HOSTED_ZONE_ID}" \
         --change-batch "{
