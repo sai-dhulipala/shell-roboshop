@@ -20,7 +20,7 @@ do
         --query 'Instances[0].InstanceId' \
         --output text)
 
-    # Step 2: Retrieve Public and Prive IP Addresses and print them
+    # Step 2: Retrieve Public and Private IP Addresses
 
     PUBLIC_IP_ADDRESS=$(aws ec2 describe-instances \
         --instance-ids "${INSTANCE_ID}" \
@@ -32,9 +32,7 @@ do
         --query 'Reservations[0].Instances[0].PrivateIpAddress' \
         --output text)
 
-    echo "Instance: ${instance}, Instance ID: ${INSTANCE_ID}, IP Address: ${IP_ADDRESS}"
-
-    # Step 3: Update Route53 Records
+    # Step 3: Determine DNS record and IP based on instance type
 
     if [ "${instance}" != 'frontend' ]
     then
@@ -45,26 +43,28 @@ do
         IP_ADDRESS="${PUBLIC_IP_ADDRESS}"
     fi
 
-    $(aws route53 change-resource-record-sets \
+    echo "Instance: ${instance}, Instance ID: ${INSTANCE_ID}, IP Address: ${IP_ADDRESS}"
+
+    # Step 4: Update Route53 Records (note: no $() around the command)
+    aws route53 change-resource-record-sets \
         --hosted-zone-id "${HOSTED_ZONE_ID}" \
-        --change-batch '{
-            "Changes": [
+        --change-batch "{
+            \"Changes\": [
                 {
-                    "Action": "UPSERT",
-                    "ResourceRecordSet": {
-                        "Name": "${DNS_RECORD}",
-                        "Type": "A",
-                        "TTL": 300,
-                        "ResourceRecords": [
+                    \"Action\": \"UPSERT\",
+                    \"ResourceRecordSet\": {
+                        \"Name\": \"${DNS_RECORD}\",
+                        \"Type\": \"A\",
+                        \"TTL\": 300,
+                        \"ResourceRecords\": [
                             {
-                                "Value": "${IP_ADDRESS}"
+                                \"Value\": \"${IP_ADDRESS}\"
                             }
                         ]
                     }
                 }
             ]
-        }'
-    )
+        }"
 
     if [ $? -ne 0 ]
     then
