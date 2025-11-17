@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -e $1 -eq 0 ]
+if [ -e $1 ]
 then
     echo "${1}: File exists"
 else
