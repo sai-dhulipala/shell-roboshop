@@ -54,7 +54,7 @@ then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>> $LOG_FILE
     VALIDATE $? "Adding application user `roboshop`"
 else
-    echo "User `Roboshop` already exists" | tee -a $LOG_FILE
+    echo "User `Roboshop` already exists" &>> $LOG_FILE
     echo -e "Adding application user `roboshop` ... ${Y}SKIPPING${N}" | tee -a $LOG_FILE
 fi
 
@@ -106,8 +106,8 @@ then
     mongosh --host mongodb.svd-learn-devops.fun </app/db/master-data.js &>> $LOG_FILE
     VALIDATE $? "Loading masterdata into MongoDB"
 else
-    echo "Masterdata already loaded"
-    echo -e "Loading masterdata into MongoDB ${Y}SKIPPING${N}"
+    echo "Masterdata already loaded" &>> $LOG_FILE
+    echo -e "Loading masterdata into MongoDB ${Y}SKIPPING${N}"  | tee -a $LOG_FILE
 fi
 
 # Step 17: Restart Service
