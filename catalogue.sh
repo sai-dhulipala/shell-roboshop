@@ -83,22 +83,26 @@ VALIDATE $? "Installing dependencies"
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>> $LOG_FILE
 VALIDATE $? "Setting up SystemD Catalogue Service"
 
-# Step 13: Enable and Start Service
+# Step 13: Reload SystemD
+systemctl daemon-reload &>> $LOG_FILE
+VALIDATE $? "Reload SystemD"
+
+# Step 14: Enable and Start Service
 systemctl enable catalogue &>> $LOG_FILE
 VALIDATE $? "Enabling catalogue"
 
 systemctl start catalogue &>> $LOG_FILE
 VALIDATE $? "Starting catalogue"
 
-# Step 14: Setup MongoDB repo
+# Step 15: Setup MongoDB repo
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOG_FILE
 VALIDATE $? "Setting up MongoDB repo"
 
-# Step 15: Install MongoDB Client
+# Step 16: Install MongoDB Client
 dnf install mongodb-mongosh -y &>> $LOG_FILE
 VALIDATE $? "Installing MongoDB Client"
 
-# Step 16: Load masterdata into MongoDB
+# Step 17: Load masterdata into MongoDB
 INDEX=$(mongosh mongodb.svd-learn-devops.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
 
 # Check if INDEX is empty or not a number
@@ -116,7 +120,7 @@ else
     echo -e "Loading masterdata into MongoDB ${Y}SKIPPING${N}"  | tee -a $LOG_FILE
 fi
 
-# Step 17: Restart Service
+# Step 18: Restart Service
 systemctl restart catalogue &>> $LOG_FILE
 VALIDATE $? "Restarting catalogue"
 
