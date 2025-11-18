@@ -52,15 +52,15 @@ id roboshop &>> $LOG_FILE
 if [ $? -ne 0 ]
 then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>> $LOG_FILE
-    VALIDATE $? "Adding application user `roboshop`"
+    VALIDATE $? "Adding application user 'roboshop'"
 else
-    echo "User `Roboshop` already exists" &>> $LOG_FILE
-    echo -e "Adding application user `roboshop` ... ${Y}SKIPPING${N}" | tee -a $LOG_FILE
+    echo "User 'Roboshop' already exists" &>> $LOG_FILE
+    echo -e "Adding application user 'roboshop' ... ${Y}SKIPPING${N}" | tee -a $LOG_FILE
 fi
 
 # Step 8: Create directory '/app'
 mkdir -p /app &>> $LOG_FILE
-VALIDATE $? "Creating `/app` directory"
+VALIDATE $? "Creating '/app' directory"
 
 # Step 9: Download source code to tmp
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>> $LOG_FILE
@@ -99,7 +99,13 @@ dnf install mongodb-mongosh -y &>> $LOG_FILE
 VALIDATE $? "Installing MongoDB Client"
 
 # Step 16: Load masterdata into MongoDB
-INDEX=$(mongosh mongodb.svd-learn-devops.fun --quite --eval "db.getMongo().getDBNames().indexOf('catalogue')")
+INDEX=$(mongosh mongodb.svd-learn-devops.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
+
+# Check if INDEX is empty or not a number
+if [ -z "$INDEX" ] || ! [[ "$INDEX" =~ ^-?[0-9]+$ ]]
+then
+    INDEX=-1  # Set to -1 to trigger data loading
+fi
 
 if [ $INDEX -lt 0 ]
 then
