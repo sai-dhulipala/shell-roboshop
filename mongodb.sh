@@ -46,4 +46,12 @@ VALIDATE $? "Enabling MongoDB service"
 systemctl start mongod &>> $LOG_FILE
 VALIDATE $? "Starting MongoDB service"
 
+# Step 7: Change bind address in mongod.conf to allow remote connections
+sed -i "s/127.0.0.1/0.0.0.0/g" /etc/mongod.conf &>>$LOG_FILE
+VALIDATE $? "Allowing remote connections to MongoDB"
+
+# Step 8: Restart MongoDB
+systemctl restart mongod &>> $LOG_FILE
+VALIDATE $? "Restarting MongoDB service"
+
 echo "Script ended at: $(date)"| tee -a $LOG_FILE
