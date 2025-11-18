@@ -37,7 +37,7 @@ dnf module disable nodejs -y &>> $LOG_FILE
 VALIDATE $? "Disabling default NodeJS"
 
 # Step 5: Enable NoteJS:20
-dnf module enable nodejs:20 -y &>>$LOG_FILE
+dnf module enable nodejs:20 -y &>> $LOG_FILE
 VALIDATE $? "Enabling NodeJS:20"
 
 # Step 6: Install NodeJS
