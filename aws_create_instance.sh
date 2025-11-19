@@ -9,7 +9,6 @@ DOMAIN="svd-learn-devops.fun"
 for instance in "$@"
 do
     # Step 1: Create EC2 Instance
-
     INSTANCE_ID=$(aws ec2 run-instances \
         --image-id "${AMI_ID}" \
         --instance-type t3.micro \
@@ -20,8 +19,11 @@ do
         --query 'Instances[0].InstanceId' \
         --output text)
 
-    # Step 2: Retrieve Public and Private IP Addresses
+    # Wait for instance to be running
+    echo "Waiting for instance ${INSTANCE_ID} to be running..."
+    aws ec2 wait instance-running --instance-ids "${INSTANCE_ID}" --region us-east-1
 
+    # Step 2: Retrieve Public and Private IP Addresses
     PUBLIC_IP_ADDRESS=$(aws ec2 describe-instances \
         --instance-ids "${INSTANCE_ID}" \
         --query 'Reservations[0].Instances[0].PublicIpAddress' \
@@ -35,7 +37,6 @@ do
     echo "Instance: ${instance}, Instance ID: ${INSTANCE_ID}, Public IP Address: ${PUBLIC_IP_ADDRESS}, Private IP Address: ${PRIVATE_IP_ADDRESS}"
 
     # Step 3: Determine DNS record and IP based on instance type
-
     if [ "${instance}" != 'frontend' ]
     then
         DNS_RECORD="${instance}.${DOMAIN}"
