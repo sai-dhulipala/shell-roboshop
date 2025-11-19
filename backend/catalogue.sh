@@ -35,7 +35,8 @@ trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 # Initialize
 echo "Script started at: $(date)"| tee -a $LOG_FILE
 
-UTILS_DIR='../utils'
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+UTILS_DIR="$SCRIPT_DIR/../utils"
 
 # Step 1: Disable NodeJS
 dnf module disable nodejs -y &>> $LOG_FILE

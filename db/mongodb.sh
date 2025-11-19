@@ -35,7 +35,8 @@ trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 # Initialize
 echo "Script started at: $(date)"| tee -a $LOG_FILE
 
-UTILS_DIR='../utils'
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+UTILS_DIR="$SCRIPT_DIR/../utils"
 
 # Step 1: Copy mongo.repo to yum.repos.d
 cp $UTILS_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOG_FILE
