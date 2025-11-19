@@ -54,7 +54,19 @@ systemctl start rabbitmq-server &>> $LOG_FILE
 echo -e "Starting RabbitMQ service ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 4: Create Roboshop user
-rabbitmqctl add_user roboshop roboshop123 &>> $LOG_FILE
-rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*" &>> $LOG_FILE
+# Check if user exists and capture the result
+if rabbitmqctl list_users &> /dev/null | grep -q "^roboshop\s"
+then
+    echo "RabbitMQ user 'roboshop' already exists" &>> $LOG_FILE
+    echo -e "Creating roboshop user ... ${Y}SKIPPING${N}" | tee -a $LOG_FILE
+
+    # You might still want to update permissions
+    rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*" &>> $LOG_FILE
+    echo -e "Updating permissions ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
+else
+    rabbitmqctl add_user roboshop roboshop123 &>> $LOG_FILE
+    rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*" &>> $LOG_FILE
+    echo -e "Creating roboshop user ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
+fi
 
 echo "Script ended at: $(date)"| tee -a $LOG_FILE
