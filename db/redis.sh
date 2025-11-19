@@ -33,7 +33,7 @@ error_handler() {
 trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 
 # Initialize
-echo "Script started at: $(date)"| tee -a $LOG_FILE
+echo "Script started at: $(date)" | tee -a $LOG_FILE
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 UTILS_DIR="$SCRIPT_DIR/../utils"
@@ -69,4 +69,4 @@ echo -e "Enabling Redis ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 systemctl start redis &>> $LOG_FILE
 echo -e "Starting Redis ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
-echo "Script ended at: $(date)"| tee -a $LOG_FILE
+echo "Script ended at: $(date)" | tee -a $LOG_FILE

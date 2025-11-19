@@ -33,7 +33,7 @@ error_handler() {
 trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 
 # Initialize
-echo "Script started at: $(date)"| tee -a $LOG_FILE
+echo "Script started at: $(date)" | tee -a $LOG_FILE
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 UTILS_DIR="$SCRIPT_DIR/../utils"
@@ -53,4 +53,4 @@ echo -e "Starting MySQL service ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 mysql_secure_installation --set-root-pass RoboShop@1
 echo -e "Setting root user password ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
-echo "Script ended at: $(date)"| tee -a $LOG_FILE
+echo "Script ended at: $(date)" | tee -a $LOG_FILE

@@ -65,7 +65,7 @@ mkdir -p /app &>> $LOG_FILE
 echo -e "Creating '/app' directory ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 6: Download source code to tmp
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>> $LOG_FILE
+curl -L -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip &>> $LOG_FILE
 echo -e "Downloading source code ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 7: Extract source code
@@ -74,56 +74,26 @@ cd /app &>> $LOG_FILE
 # We are doing this to ensure idempotency,
 # meaning even if we run the script twice, it should be working fine
 rm -rf /app/* &>> $LOG_FILE
-unzip /tmp/catalogue.zip &>> $LOG_FILE
+unzip /tmp/cart.zip &>> $LOG_FILE
 echo -e "Extracting source code ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 8: Install dependencies
 npm install &>> $LOG_FILE
 echo -e "Installing dependencies ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
-# Step 9: Setup SystemD Catalogue Service
-cp $UTILS_DIR/catalogue.service /etc/systemd/system/catalogue.service &>> $LOG_FILE
-echo -e "Setting up SystemD Catalogue Service ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
+# Step 9: Setup SystemD Cart Service
+cp $UTILS_DIR/cart.service /etc/systemd/system/cart.service &>> $LOG_FILE
+echo -e "Setting up SystemD Cart Service ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 10: Reload SystemD
 systemctl daemon-reload &>> $LOG_FILE
 echo -e "Reload SystemD ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 11: Enable and Start Service
-systemctl enable catalogue &>> $LOG_FILE
-echo -e "Enabling catalogue ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
+systemctl enable cart &>> $LOG_FILE
+echo -e "Enabling cart ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
-systemctl start catalogue &>> $LOG_FILE
-echo -e "Starting catalogue ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
+systemctl start cart &>> $LOG_FILE
+echo -e "Starting cart ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
-# Step 12: Setup MongoDB repo
-cp $UTILS_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOG_FILE
-echo -e "Setting up MongoDB repo ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
-
-# Step 13: Install MongoDB Client
-dnf install mongodb-mongosh -y &>> $LOG_FILE
-echo -e "Installing MongoDB Client ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
-
-# Step 14: Load masterdata into MongoDB
-INDEX=$(mongosh mongodb.svd-learn-devops.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
-
-# Check if INDEX is empty or not a number
-if [ -z "$INDEX" ] || ! [[ "$INDEX" =~ ^-?[0-9]+$ ]]
-then
-    INDEX=-1  # Set to -1 to trigger data loading
-fi
-
-if [ $INDEX -lt 0 ]
-then
-    mongosh --host mongodb.svd-learn-devops.fun </app/db/master-data.js &>> $LOG_FILE
-    echo -e "Loading masterdata into MongoDB ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
-else
-    echo "Masterdata already loaded" &>> $LOG_FILE
-    echo -e "Loading masterdata into MongoDB ... ${Y}SKIPPING${N}"  | tee -a $LOG_FILE
-fi
-
-# Step 15: Restart Service
-systemctl restart catalogue &>> $LOG_FILE
-echo -e "Restarting catalogue ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
-
-echo "Script ended at: $(date)" | tee -a $LOG_FILE
+echo "Script ended at: $(date)"| tee -a $LOG_FILE
