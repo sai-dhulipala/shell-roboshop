@@ -7,6 +7,13 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
+# Log Directory configuration
+LOGS_DIR="/var/log/shell-roboshop"
+mkdir -p $LOGS_DIR
+
+SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
+LOG_FILE="${LOGS_DIR}/${SCRIPT_NAME}.log"
+
 # User Validation
 USERID=$(id -u)
 
@@ -25,14 +32,7 @@ error_handler() {
 
 trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 
-# Log Directory configuration
-LOGS_DIR="/var/log/shell-roboshop"
-SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
-LOG_FILE="${LOGS_DIR}/${SCRIPT_NAME}.log"
-
-### Initialize
-mkdir -p $LOGS_DIR
-
+# Initialize
 echo "Script started at: $(date)"| tee -a $LOG_FILE
 
 UTILS_DIR='../utils'
