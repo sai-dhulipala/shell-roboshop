@@ -70,7 +70,7 @@ unzip /tmp/frontend.zip &>> $LOG_FILE
 echo -e "Extracting source code ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 7: Replace Nginx.conf with modified configuration
-rm -rf /etc/nginx/nginx.conf
+rm -rf /etc/nginx/nginx.conf &>> $LOG_FILE
 cp $UTILS_DIR/nginx.conf /etc/nginx/nginx.conf &>> $LOG_FILE
 echo -e "Replacing Nginx.conf with modified configuration ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
