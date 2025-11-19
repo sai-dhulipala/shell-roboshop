@@ -50,11 +50,7 @@ dnf install nodejs -y &>> $LOG_FILE
 echo -e "Installing NodeJS ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
 
 # Step 4: Add application user 'roboshop'
-# Check if user exists -> if not then create the user -> else skip
-
-id roboshop &>> $LOG_FILE
-
-if [ $? -ne 0 ]
+if ! id roboshop &> /dev/null
 then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>> $LOG_FILE
     echo -e "Adding application user 'roboshop' ... ${G}SUCCESS${N}" | tee -a $LOG_FILE
