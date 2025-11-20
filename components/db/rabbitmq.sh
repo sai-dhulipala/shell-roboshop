@@ -37,18 +37,22 @@ start_service $SERVICE
 
 ## Step 3: Create Roboshop user
 log_echo "Creating roboshop user ..."
-if rabbitmqctl list_users &> /dev/null | grep -q "^roboshop\s"
-then
-    log_echo "RabbitMQ user 'roboshop' already exists"
-    log_exec rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
-    log_echo "Creating roboshop user ... ${Y}SKIPPING${N}"
-else
-    log_exec rabbitmqctl add_user roboshop roboshop123
-    log_exec rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
+
+if rabbitmqctl add_user roboshop roboshop123 &>> "$LOG_FILE" 2>&1; then
     log_echo "Creating roboshop user ... ${G}SUCCESS${N}"
+else
+    if rabbitmqctl list_users 2>/dev/null | grep -q "^roboshop\s"; then
+        log_echo "RabbitMQ user 'roboshop' already exists"
+        log_echo "Creating roboshop user ... ${Y}SKIPPING${N}"
+    else
+        log_echo "Creating roboshop user ... ${R}FAILED${N}"
+        exit 1
+    fi
 fi
 
-### Restart Service
+log_exec rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
+
+# Step 4: Restart Service
 restart_service $SERVICE
 
 # End script execution
