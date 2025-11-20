@@ -7,7 +7,7 @@ SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 COMPONENT="mongodb"
 REPO="mongo"
 PACKAGE="mongodb-org"
-SERVICE=$COMPONENT
+SERVICE="mongod"
 
 # Import common variables and functions
 source "$SCRIPT_DIR/../../utils/variables.conf"
