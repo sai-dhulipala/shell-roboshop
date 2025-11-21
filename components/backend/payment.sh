@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 COMPONENT="payment"
-PACKAGE="python3 gcc python3-devel"
+PACKAGES=("python3" "gcc" "python3-devel")
 SERVICE=$COMPONENT
 
 # Import common variables and functions
@@ -33,7 +33,11 @@ setup_source_code $COMPONENT
 add_app_user $APP_USER
 
 ## Step 3: Package Management
-install_runtime $PACKAGE
+for PACKAGE in "${PACKAGES[@]}"
+do
+    install_runtime $PACKAGE
+done
+
 install_dependencies $COMPONENT
 
 ## Step 4: Service Management

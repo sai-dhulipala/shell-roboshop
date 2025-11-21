@@ -100,11 +100,11 @@ enable_custom_runtime() {
 }
 
 install_runtime() {
-    local runtime=("$@")
+    local runtime=$1
 
-    log_echo "Installing ${runtime[@]} ..."
-    log_exec dnf install "${runtime[@]}" -y
-    log_echo "Installing ${runtime[@]} ... ${G}SUCCESS${N}"
+    log_echo "Installing ${runtime} ..."
+    log_exec dnf install "${runtime}" -y
+    log_echo "Installing ${runtime} ... ${G}SUCCESS${N}"
 }
 
 install_dependencies() {
