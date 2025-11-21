@@ -113,7 +113,7 @@ install_dependencies() {
     log_echo "Installing dependencies ..."
     log_exec cd /app
 
-    elif [ "${component}" == "shipping" ]; then
+    if [ "${component}" == "shipping" ]; then
         log_exec mvn clean package
         log_exec mv target/${component}-1.0.jar ${component}.jar
     elif [ "${component}" == "dispatch" ]; then
