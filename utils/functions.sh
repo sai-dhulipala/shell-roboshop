@@ -27,14 +27,10 @@ log_exec() {
 }
 
 ## Error handler configuration
-setup_error_handler() {
-    error_handler() {
-        log_echo "${R}Error${N} at line ${1}: ${2}"
-        log_echo "Exit code: ${3}"
-        exit 1
-    }
-
-    trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
+error_handler() {
+    log_echo "${R}Error${N} at line ${1}: ${2}"
+    log_echo "Exit code: ${3}"
+    exit 1
 }
 
 # B. Source code management functions
@@ -113,21 +109,22 @@ install_runtime() {
 
 install_dependencies() {
     local runtime=$1
+    local component=$2
 
     log_echo "Installing dependencies ..."
     log_exec cd /app
 
-    if [ "${runtime}" == "nodejs" ]; then
-        log_exec npm install
-    elif [ "${runtime}" == "maven" ]; then
+    elif [ "${component}" == "shipping" ]; then
         log_exec mvn clean package
-        log_exec mv target/${COMPONENT}-1.0.jar ${COMPONENT}.jar
-    elif [ "${runtime}" == "golang" ]; then
+        log_exec mv target/${component}-1.0.jar ${component}.jar
+    elif [ "${component}" == "dispatch" ]; then
         log_exec go mod init dispatch
         log_exec go get
         log_exec go build
-    elif [ "${runtime}" == "python3 gcc python3-devel" ]; then
+    elif [ "${component}" == "payment" ]; then
         log_exec pip3 install -r requirements.txt
+    else:
+        log_exec npm install
     fi
 
     log_echo "Installing dependencies ... ${G}SUCCESS${N}"

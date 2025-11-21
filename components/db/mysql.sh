@@ -20,7 +20,7 @@ validate_user
 setup_logging
 
 ## C. Setup Error Handling
-setup_error_handler
+trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 
 # Start script execution
 START_TIME=$(date +%s)
