@@ -36,7 +36,7 @@ add_app_user $APP_USER
 ## Step 3: Package Management
 enable_custom_runtime $PACKAGE $VERSION
 install_runtime $PACKAGE
-install_dependencies $PACKAGE
+install_dependencies $COMPONENT
 
 ## Step 4: Service Management
 setup_systemd_service $SERVICE

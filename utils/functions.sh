@@ -108,8 +108,7 @@ install_runtime() {
 }
 
 install_dependencies() {
-    local runtime=$1
-    local component=$2
+    local component=$1
 
     log_echo "Installing dependencies ..."
     log_exec cd /app
