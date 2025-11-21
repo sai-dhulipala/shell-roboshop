@@ -122,7 +122,7 @@ install_dependencies() {
         log_exec go build
     elif [ "${component}" == "payment" ]; then
         log_exec pip3 install -r requirements.txt
-    else:
+    else
         log_exec npm install
     fi
 
