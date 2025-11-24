@@ -28,8 +28,6 @@ SUB_COMPONENT=${2:-""}
 START_TIME=$(date +%s)
 log_echo "Script started at: $(date)"
 
-exit 1
-
 case $COMPONENT in
     "frontend")
         deploy_frontend
