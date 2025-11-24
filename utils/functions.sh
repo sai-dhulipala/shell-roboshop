@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # A. Base functions
-## User validation
 validate_user() {
     if [ $(id -u) -ne 0 ]
     then
@@ -10,23 +9,56 @@ validate_user() {
     fi
 }
 
-## Logging configuration
+show_usage() {
+    echo -e "${Y}Usage${N}: $0 <component> [sub-component] ...\n${Y}Valid combinations${N}:"
+    for comp in "${!VALID_SUBCOMPONENTS[@]}"; do
+        echo -e "  $comp → ${VALID_SUBCOMPONENTS[$comp]:-'(no sub-component needed)'}"
+    done
+}
+
+validate_args() {
+    [[ $# -lt 1 ]] && { echo -e "${R}Error${N}: No arguments provided"; show_usage; exit 1; }
+
+    local component=$1 valid_subs="${VALID_SUBCOMPONENTS[$1]}"
+    shift
+
+    # Validate component exists
+    [[ -z "${VALID_SUBCOMPONENTS[$component]+isset}" ]] && {
+        echo -e "${R}Error${N}: Invalid component '$component'\n${Y}Valid components${N}: ${!VALID_SUBCOMPONENTS[*]}"
+        exit 1
+    }
+
+    # Handle components with/without sub-components
+    if [[ -z "$valid_subs" ]]; then
+        [[ $# -gt 0 ]] && echo -e "${Y}Warning${N}: '$component' doesn't require sub-components, ignoring: $*"
+    else
+        [[ $# -lt 1 ]] && {
+            echo -e "${R}Error${N}: '$component' requires at least one sub-component\n${Y}Valid sub-components${N}: $valid_subs"
+            exit 1
+        }
+        # Validate each sub-component
+        for sub in "$@"; do
+            [[ ! " $valid_subs " =~ " $sub " ]] && {
+                echo -e "${R}Error${N}: Invalid sub-component '$sub' for '$component'\n${Y}Valid sub-components${N}: $valid_subs"
+                exit 1
+            }
+        done
+    fi
+}
+
 setup_logging() {
     mkdir -p $LOGS_DIR
     LOG_FILE="${LOGS_DIR}/${SCRIPT_NAME}.log"
 }
 
-## Echo with logging
 log_echo() {
     echo -e $1 | tee -a "$LOG_FILE"
 }
 
-## Execute command and log output
 log_exec() {
     "$@" &>> "$LOG_FILE"
 }
 
-## Error handler configuration
 error_handler() {
     log_echo "${R}Error${N} at line ${1}: ${2}"
     log_echo "Exit code: ${3}"
@@ -34,7 +66,6 @@ error_handler() {
 }
 
 # B. Source code management functions
-## Setup source code
 setup_source_code() {
     local component=$1
 
@@ -63,24 +94,23 @@ setup_source_code() {
 }
 
 # C. User management functions
-## Add application user
 add_app_user() {
-    local app_user=$1
+    log_echo "Adding application user '${APP_USER}' ..."
 
-    log_echo "Adding application user '${app_user}' ..."
-    if ! id $app_user &> /dev/null
+    if ! id $APP_USER &> /dev/null
     then
-        log_exec useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" $app_user
-        log_echo "Adding application user '${app_user}' ... ${G}SUCCESS${N}"
+        log_exec useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" $APP_USER
+        log_echo "Adding application user '${APP_USER}' ... ${G}SUCCESS${N}"
     else
-        log_echo "User '${app_user}' already exists"
-        log_echo "Adding application user '${app_user}' ... ${Y}SKIPPING${N}"
+        log_echo "User '${APP_USER}' already exists"
+        log_echo "Adding application user '${APP_USER}' ... ${Y}SKIPPING${N}"
     fi
 }
 
 # D. Package management functions
 create_repo() {
     local repo=$1
+
     log_echo "Creating ${repo}.repo file ..."
     log_exec cp ${TEMPLATES_DIR}/${repo}.repo /etc/yum.repos.d/${repo}.repo
     log_echo "Creating ${repo}.repo file ... ${G}SUCCESS${N}"
@@ -169,5 +199,3 @@ restart_service() {
     log_exec systemctl restart ${component}
     log_echo "Restarting ${component} ... ${G}SUCCESS${N}"
 }
-
-
