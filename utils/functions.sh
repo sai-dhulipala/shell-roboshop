@@ -9,43 +9,6 @@ validate_user() {
     fi
 }
 
-show_usage() {
-    echo -e "${Y}Usage${N}: $0 <component> [sub-component] ...\n${Y}Valid combinations${N}:"
-    for comp in "${!VALID_SUBCOMPONENTS[@]}"; do
-        echo -e "  $comp → ${VALID_SUBCOMPONENTS[$comp]:-'(no sub-component needed)'}"
-    done
-}
-
-validate_args() {
-    [[ $# -lt 1 ]] && { echo -e "${R}Error${N}: No arguments provided"; show_usage; exit 1; }
-
-    local component=$1 valid_subs="${VALID_SUBCOMPONENTS[$1]}"
-    shift
-
-    # Validate component exists
-    [[ -z "${VALID_SUBCOMPONENTS[$component]+isset}" ]] && {
-        echo -e "${R}Error${N}: Invalid component '$component'\n${Y}Valid components${N}: ${!VALID_SUBCOMPONENTS[*]}"
-        exit 1
-    }
-
-    # Handle components with/without sub-components
-    if [[ -z "$valid_subs" ]]; then
-        [[ $# -gt 0 ]] && echo -e "${Y}Warning${N}: '$component' doesn't require sub-components, ignoring: $*"
-    else
-        [[ $# -lt 1 ]] && {
-            echo -e "${R}Error${N}: '$component' requires at least one sub-component\n${Y}Valid sub-components${N}: $valid_subs"
-            exit 1
-        }
-        # Validate each sub-component
-        for sub in "$@"; do
-            [[ ! " $valid_subs " =~ " $sub " ]] && {
-                echo -e "${R}Error${N}: Invalid sub-component '$sub' for '$component'\n${Y}Valid sub-components${N}: $valid_subs"
-                exit 1
-            }
-        done
-    fi
-}
-
 setup_logging() {
     mkdir -p $LOGS_DIR
     LOG_FILE="${LOGS_DIR}/${SCRIPT_NAME}.log"

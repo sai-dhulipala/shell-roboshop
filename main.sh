@@ -16,7 +16,6 @@ source "$SCRIPT_DIR/components/frontend.sh"
 
 # Script Initialization
 validate_user
-validate_args "$@"
 setup_logging
 trap 'error_handler $LINENO "$BASH_COMMAND" $?' ERR
 
